@@ -10,7 +10,8 @@ const session = require("express-session");
 const { passport } = require("./passport");
 const flash = require("connect-flash");
 const { logoutRouter } = require("./routers/logoutRouter");
-const { fileRouter } = require("./routers/fileRouter");
+const { filesRouter } = require("./routers/filesRouter");
+const { initFiles } = require("./db/queries");
 
 const app = new express();
 
@@ -42,9 +43,17 @@ app.use(flash());
 app.use("/signup", signupRouter);
 app.use("/logout", logoutRouter);
 app.use("/login", loginRouter);
-app.use("/file", fileRouter);
+app.use("/files", filesRouter);
 app.use("/", indexRouter);
-app.use("/file", fileRouter);
+
+async function initialize() {
+  try {
+    await initFiles();
+  } catch (error) {
+    console.error("Error initializing table:", error);
+  }
+}
+initialize();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
