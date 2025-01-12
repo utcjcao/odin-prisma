@@ -5,12 +5,12 @@ const express = require("express");
 const { indexRouter } = require("./routers/indexRouter");
 const { signupRouter } = require("./routers/signupRouter");
 const { loginRouter } = require("./routers/loginRouter");
+const { logoutRouter } = require("./routers/logoutRouter");
+const { filesRouter } = require("./routers/filesRouter");
 const path = require("path");
 const session = require("express-session");
 const { passport } = require("./passport");
 const flash = require("connect-flash");
-const { logoutRouter } = require("./routers/logoutRouter");
-const { filesRouter } = require("./routers/filesRouter");
 const { initFiles } = require("./db/queries");
 
 const app = new express();

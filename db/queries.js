@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client"); // Import Prisma Client
+const { deleteFromCloud } = require("../cloudinary");
 
 const prisma = new PrismaClient();
 
@@ -31,39 +32,44 @@ async function findUser(username) {
   }
 }
 
-async function addFile(name, parent_id, data) {
+async function addFile(name, parent_id, owner_id, dataURL) {
   await prisma.files.create({
     data: {
       name: name,
       type: "file",
       parent_id: parent_id,
-      data: data,
+      owner_id: owner_id,
+      dataURL: dataURL,
     },
   });
 }
 
-async function addFolder(name, parent_id) {
+async function addFolder(name, parent_id, owner_id) {
   await prisma.files.create({
     data: {
       name: name,
       type: "folder",
       parent_id: parent_id,
+      owner_id: owner_id,
     },
   });
 }
 
 async function deleteData(id) {
-  console.log("delete", id);
-  // delete the parent
-  await prisma.files.delete({
+  const files = await prisma.files.findMany({
     where: {
-      id: id,
+      OR: [{ id: id }, { parent_id: id }],
     },
   });
-  // delete children
-  await prisma.files.delete({
+  console.log("id", id);
+  console.log("files", files);
+  for (let file of files) {
+    await deleteFromCloud(file.name);
+    console.log(file.name);
+  }
+  await prisma.files.deleteMany({
     where: {
-      parent_id: id,
+      OR: [{ id: id }, { parent_id: id }],
     },
   });
 }
@@ -89,18 +95,50 @@ async function getParent(id) {
 async function initFiles() {
   const main = await prisma.files.findMany({
     where: {
-      id: 1,
+      id: -1,
+    },
+  });
+  // create a central folder who does not have a parent, and also does not have an owner (so no one can access)
+  if (main.length === 0) {
+    await prisma.files.create({
+      data: {
+        id: -1,
+        name: "main",
+        type: "folder",
+        parent_id: 0,
+        owner_id: -1,
+      },
+    });
+  }
+}
+
+async function createUserFiles(user) {
+  const main = await prisma.files.findMany({
+    where: {
+      owner_id: user.id,
     },
   });
   if (main.length === 0) {
     await prisma.files.create({
       data: {
-        name: "main",
+        name: `${user.username}'s files`,
         type: "folder",
         parent_id: 0,
+        owner_id: user.id,
+        isRootFolder: true,
       },
     });
   }
+}
+
+async function getUserRootFolderId(user) {
+  const main = await prisma.files.findFirst({
+    where: {
+      owner_id: user.id,
+      isRootFolder: true,
+    },
+  });
+  return parseInt(main.id);
 }
 
 module.exports = {
@@ -112,4 +150,6 @@ module.exports = {
   getChildren,
   getParent,
   initFiles,
+  createUserFiles,
+  getUserRootFolderId,
 };

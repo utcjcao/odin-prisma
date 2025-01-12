@@ -3,6 +3,8 @@ const {
   getChildren,
   deleteData,
   addFolder,
+  addFile,
+  getUserRootFolderId,
 } = require("../db/queries");
 
 class filesController {
@@ -11,32 +13,36 @@ class filesController {
     // create a new folder from download
     const parentId = parseInt(req.params.id);
     const name = req.body.name;
-    await addFolder(name, parentId);
+    const ownerId = req.user.id;
+    await addFolder(name, parentId, ownerId);
     res.redirect(`/files/${req.params.id}`);
     // rerender the original page after download
-
-    console.log("done");
   };
   postFile = async (req, res) => {
     // create a new file from download (logic is already in multer middleware in router)
     // rerender the original page after download
+    const parentId = parseInt(req.params.id);
+    const name = req.file.filename;
+    const ownerId = req.user.id;
+    const filePath = req.fileUrl;
+    // need to add upload file logic to cloud
+    await addFile(name, parentId, ownerId, filePath);
     res.redirect(`/files/${req.params.id}`);
   };
   getFilePage = async (req, res) => {
     const id = parseInt(req.params.id);
-    console.log("id:", id);
     const parent = await getParent(id);
-    console.log(parent);
 
     if (parent.type === "folder") {
-      console.log("folder");
-
       // if its a folder, we feed in the children files and the main parent data
       const children = await getChildren(id);
-      return res.render("folder", { parentFile: parent, files: children });
+      return res.render("folder", {
+        parentFile: parent,
+        files: children,
+        user: req.user,
+      });
     } else {
       // we redirect to the download link for a file
-      console.log("testing");
       res.redirect(parent.dataURL);
     }
   };
@@ -45,15 +51,23 @@ class filesController {
     const parentId = parseInt(req.params.id);
     const childId = parseInt(req.params.cId);
     try {
-      console.log(childId);
       await deleteData(childId);
-      console.log("deleted");
       // redirect to parent page after deletion
       res.redirect(`/files/${parentId}`);
     } catch (error) {
-      console.log("delete error");
       res.render("");
     }
+  };
+  getUserFiles = async (req, res) => {
+    const id = await getUserRootFolderId(req.user);
+    const parent = await getParent(id);
+
+    const children = await getChildren(id);
+    return res.render("folder", {
+      parentFile: parent,
+      files: children,
+      user: req.user,
+    });
   };
 }
 

@@ -26,4 +26,6 @@ model files {
     name String 
     type String
     dataURL String?
+    owner_id  Int
+    isRootFolder Boolean @default(false)
 }

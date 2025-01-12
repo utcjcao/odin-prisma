@@ -5,8 +5,10 @@ const {
   postFile,
   deleteFile,
   postFolder,
+  getUserFiles,
 } = require("../controllers/filesController");
 const path = require("path");
+const { saveToCloud } = require("../cloudinary");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -22,23 +24,28 @@ const upload = multer({ storage: storage });
 
 const filesRouter = Router();
 
-filesRouter.get("/:id", async (req, res) => {
-  await getFilePage(req, res);
-});
-
 filesRouter.get("/delete/:id/:cId", async (req, res) => {
   await deleteFile(req, res);
+});
+
+filesRouter.get("/user", async (req, res) => {
+  await getUserFiles(req, res);
 });
 
 filesRouter.post(
   "/upload_file/:id",
   upload.single("file"),
+  saveToCloud,
   async (req, res) => {
     await postFile(req, res);
   }
 );
 filesRouter.post("/upload_folder/:id", async (req, res) => {
   await postFolder(req, res);
+});
+
+filesRouter.get("/:id", async (req, res) => {
+  await getFilePage(req, res);
 });
 
 module.exports = { filesRouter };
