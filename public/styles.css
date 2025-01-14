@@ -1,7 +1,83 @@
-.folder-button {
-    background-color: green;
+.page-header {
+    display: flex;
+    padding: 20px;
+    justify-content: space-between;
+    border: 1px solid black;
 }
 
-.file-button {
-    background: cyan;
+body {
+    margin: 0;
+    padding: 0;
+    font-family: monospace;
+}
+
+.add-data-container {
+    display: flex;
+    gap: 20px;
+}
+
+.main-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    flex-direction: column;
+}
+
+.signup-container, .login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+.file-upload-container, .folder-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.files-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+}
+
+.file-card {
+    border: 1px solid black;
+    height: 120px;
+    width: 120px;
+    overflow: hidden;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.file-card:hover {
+    transform: scale(1.1);
+}
+
+.delete-container {
+    display: flex;
+    margin-left: auto;
+}
+
+.delete-btn {
+    color: red;
+}
+
+button.folder-button, button.file-button {
+    border: none;
+    text-decoration: underline;
+    font-family: monospace;
+}
+
+button {
+    background-color: white;   
 }

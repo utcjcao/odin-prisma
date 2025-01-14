@@ -22,7 +22,7 @@ class filesController {
     // create a new file from download (logic is already in multer middleware in router)
     // rerender the original page after download
     const parentId = parseInt(req.params.id);
-    const name = req.file.filename;
+    const name = req.file.originalname;
     const ownerId = req.user.id;
     const filePath = req.fileUrl;
     // need to add upload file logic to cloud
@@ -32,6 +32,10 @@ class filesController {
   getFilePage = async (req, res) => {
     const id = parseInt(req.params.id);
     const parent = await getParent(id);
+    if (parent == null) {
+      res.redirect("/files/user");
+    }
+    // TODO: need to check if parent is a valid folder, and if not display an error
 
     if (parent.type === "folder") {
       // if its a folder, we feed in the children files and the main parent data
@@ -59,6 +63,9 @@ class filesController {
     }
   };
   getUserFiles = async (req, res) => {
+    if (req.user == null) {
+      res.render("index");
+    }
     const id = await getUserRootFolderId(req.user);
     const parent = await getParent(id);
 

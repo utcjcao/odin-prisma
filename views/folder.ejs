@@ -1,54 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Folder</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
+
 <body>
   <% if (locals.user) { %>
-    <!-- if we're not in root folder, then have a go back -->
-    <!-- parent id for root folder will be 0 -->
-    <% if (parentFile.owner_id === locals.user.id) { %>
-      <% if (parentFile.parent_id) { %>
-        <form action="/files/<%= parentFile.parent_id %>" method="GET">
-          <button type="submit" class="btn">Go Back</button>
-        </form>
-      <% } %>
-      <div>
-        <%= parentFile.name %>
-      </div>
-      <!-- form to upload files/data -->
-      <div class="add-data-container">
-        <form action="/files/upload_file/<%= parentFile.id %>" method="post" enctype="multipart/form-data">
-          <input type="file" name="file" />
-          <button type="submit">submit</button>
-        </form>
-        <form action="/files/upload_folder/<%= parentFile.id %>" method="post">
-          <input type="text" name="name" placeholder="folder name" />
-          <button type="submit">submit</button>
-        </form>
-      </div>
-      <div class="container">
-        <% files.forEach(file => { %>
-          <div>
-            <form action="/files/<%= file.id %>" method="GET">
-              <button type="submit" class="<%= file.type === 'folder' ? 'folder-button' : 'file-button' %>">
-                <%= file.name %> <!-- Display link to the file or folder name -->
-              </button>
-            </form>        
-            <form action="/files/delete/<%= parentFile.id %>/<%= file.id %>" method="GET">
-              <button type="submit" class="delete btn">Delete</button>
+    <%- include('components/header', {user: user}); %>
+      <!-- if we're not in root folder, then have a go back -->
+      <!-- parent id for root folder will be 0 -->
+      <div class="main-container">
+        <% if (parentFile.owner_id===locals.user.id) { %>
+          <% if (parentFile.parent_id) { %>
+            <form action="/files/<%= parentFile.parent_id %>" method="GET">
+              <button type="submit" class="btn">Go Back</button>
             </form>
-          </div>
-        <% }); %> <!-- Closing the forEach loop properly -->
+            <% } %>
+              <h1>
+                <%= parentFile.name %>
+              </h1>
+              <!-- form to upload files/data -->
+              <div class="add-data-container">
+                <div class="file-upload-container">
+                  <form action="/files/upload_file/<%= parentFile.id %>" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" />
+                    <button type="submit">upload file</button>
+                  </form>
+                </div>
+                <div class="folder-upload-container">
+                  <form action="/files/upload_folder/<%= parentFile.id %>" method="post">
+                    <input type="text" name="name" placeholder="folder name" />
+                    <button type="submit">add folder</button>
+                  </form>
+                </div>
+              </div>
+              <div class="files-container">
+                <% files.forEach(file=> { %>
+                  <div class="file-card">
+                    <div class="delete-container">
+                      <form action="/files/delete/<%= parentFile.id %>/<%= file.id %>" method="GET">
+                        <button type="submit" class="delete-btn">x</button>
+                      </form>
+                    </div>
+                    <div>
+                      <%= file.name %>
+                    </div>
+                    <form action="/files/<%= file.id %>" method="GET">
+                      <button type="submit" class="<%= file.type === 'folder' ? 'folder-button' : 'file-button' %>">
+                        <!-- Display link to the file or folder name -->
+                        <% if (file.type==='folder' ) { %>
+                          <p>open folder</p>
+                          <% } else { %>
+                            <p>download file</p>
+                            <% } %>
+
+                      </button>
+                    </form>
+                  </div>
+                  <% }); %> <!-- Closing the forEach loop properly -->
+              </div>
+              <% } else { %>
+                <div>you don't have user permissions!</div>
+                <% } %>
+                  <% } else { %>
+                    <h1>you need to login</h1>
+                    <% } %>
       </div>
-    <% } else { %>
-      <div>you don't have user permissions!</div>
-    <% } %>
-  <% } else { %>
-    <h1>you need to login</h1>
-  <% } %>
 </body>
+
 </html>

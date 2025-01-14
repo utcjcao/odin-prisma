@@ -10,17 +10,27 @@ cloudinary.config({
 
 async function saveToCloud(req, res, next) {
   try {
-    // Upload the file to Cloudinary (replace filePath with the file to upload)
-    const uploadResponse = await cloudinary.uploader.upload(req.file.path, {
-      public_id: req.file.filename,
-      resource_type: "auto", // detect file type
+    const buffer = req.file.buffer;
+    const uploadResult = await new Promise((resolve) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            public_id: req.file.originalname,
+            resource_type: "auto",
+          },
+          (error, uploadResult) => {
+            return resolve(uploadResult);
+          }
+        )
+        .end(buffer);
     });
-
-    req.fileUrl = uploadResponse.secure_url;
+    req.fileUrl = uploadResult.secure_url;
     next();
-  } catch (error) {
-    console.error("Error uploading file to Cloudinary:", error);
-    throw error;
+  } catch (err) {
+    res.status(500).json({
+      error: "Failed to upload file to Cloudinary",
+      message: err.message,
+    });
   }
 }
 

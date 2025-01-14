@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,15 +8,22 @@
     <link rel="stylesheet" href="/styles.css">
 
 </head>
+
 <body>
-    testing yippee
-    <% if (locals.user) { %>
-        <div class="">
-            <%= locals.user.username %>
+    <%- include('components/header', {user: user}); %>
+        <div class="main-container">
+            <div>
+                This project is a basic cloud storage app built with Node.js, Express, and Prisma. Users can securely
+                log in
+                using Passport.js, upload files, organize them into folders, and view file details like name, size, and
+                upload time. Files are stored in Cloudinary for easy access and management. The app offers a simple and
+                effective way to manage personal files with session-based authentication and cloud storage integration.
+            </div>
+            <% if (!locals.user) { %>
+                <a href="/signup">Don't have an account? Sign up</a>
+                <% } %>
         </div>
-        <form action="/files/user" method="GET">
-            <button type="submit" class="delete btn">get user files</button>
-        </form>
-    <% }; %>
+
 </body>
+
 </html>
