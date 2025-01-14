@@ -5,6 +5,8 @@ using Passport.js, upload files, organize them into folders, and view file detai
 upload time. Files are stored in Cloudinary for easy access and management. The app offers a simple and
 effective way to manage personal files with session-based authentication and cloud storage integration.
 
+find it here: https://odin-prisma-production.up.railway.app/
+
 Things I learned: how to use prisma to shorten commands, improved my route handling skills (learned how to use multer and cloudinary)
 
 Things I struggled with: how to correctly connect middleware, and how to properly migrate prisma schemas.
