@@ -29,7 +29,7 @@
     "scripts": {
         "populatedb": "node db/populatedb.js",
         "start": "node app.js",
-        "postinstall": "prisma generate"
+        "postinstall": "npx prisma generate"
     }
     
 }
