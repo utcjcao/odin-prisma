@@ -28,6 +28,8 @@
     "main": "app.js",
     "scripts": {
         "populatedb": "node db/populatedb.js",
-        "start": "node app.js"
+        "start": "node app.js",
+        "postinstall": "prisma generate"
     }
+    
 }
